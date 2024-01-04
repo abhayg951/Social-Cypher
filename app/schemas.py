@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, conint
 from typing import Optional
 from datetime import datetime
 
@@ -39,6 +39,14 @@ class PostResponse(BasePost):
     class Config:
         from_attributes = True
 
+class PostOut(BaseModel):
+    Post: PostResponse
+    likes: int
+
+    class Config:
+        from_attributes = True
+
+
 
 class Token(BaseModel):
     access_token: str
@@ -46,3 +54,15 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[str] = None
+
+'''
+for creating the like system we create the response schema for the like system
+'post_id' will be the post id, and
+'like_dir' is the like direction which can be 1 or 0
+1 means that post is liked  and
+0 means that post is not liked
+'''
+
+class LikeSchema(BaseModel):
+    post_id: int
+    like_dir: conint(le=1)

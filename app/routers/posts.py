@@ -3,15 +3,23 @@ from .. import schemas, models, oauth2
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from ..database import get_db
+from sqlalchemy import func
+from fastapi.encoders import jsonable_encoder
+from fastapi.responses import JSONResponse
 
 routers = APIRouter(
     prefix="/posts",
     tags=["Posts"]
 )
 
-@routers.get('/', response_model=List[schemas.PostResponse])
+# @routers.get('/', response_model=List[schemas.PostResponse])
+@routers.get('/', response_model=List[schemas.PostOut])
 def get_posts(db: Session = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user), limit: int = 10, skip: int = 0, search: Optional[str]= "" ):
-    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+    # posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
+
+
+    posts = db.query(models.Post, func.count(models.Like.post_id).label("likes")).join(
+        models.Like, models.Like.post_id == models.Post.id , isouter=True).group_by(models.Post.id).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     return posts
 
 
@@ -27,9 +35,11 @@ def create_post(post: schemas.CreatePost, db: Session = Depends(get_db), current
     return new_post
 
 
-@routers.get('/{id}', response_model=schemas.PostResponse)
+@routers.get('/{id}', response_model=schemas.PostOut)
 def get_single_post(id: str, db: Session = Depends(get_db), current_user: models.User = Depends(oauth2.get_current_user)):
-    single_post = db.query(models.Post).filter(models.Post.id == id).first()
+    # single_post = db.query(models.Post).filter(models.Post.id == id).first()
+    single_post = db.query(models.Post, func.count(models.Like.post_id).label("likes")).join(
+        models.Like, models.Like.post_id == models.Post.id , isouter=True).group_by(models.Post.id).filter(models.Post.id == id).first()
     print(single_post)
     if not single_post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
