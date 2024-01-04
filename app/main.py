@@ -16,7 +16,8 @@ app = FastAPI(
     contact={
         "name": "Abhay Gupta",
         "email": "insuabhay951@gmail.com"
-    }
+    },
+     docs_url="/"
 )
 
 models.Base.metadata.create_all(bind=engine)
