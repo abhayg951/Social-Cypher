@@ -3,6 +3,8 @@ from . import models
 from .database import engine
 from .routers import posts, users, auth, like
 from .config import settings
+from os import getenv
+import uvicorn
 
 print(settings.database_name)
 
@@ -26,3 +28,7 @@ app.include_router(posts.routers)
 app.include_router(users.routers)
 app.include_router(auth.routers)
 app.include_router(like.router)
+
+if __name__ == "__main__":
+    port = int(getenv("PORT", 8000))
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=True)
