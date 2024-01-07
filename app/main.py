@@ -5,6 +5,7 @@ from .routers import posts, users, auth, like
 from .config import settings
 from os import getenv
 import uvicorn
+from fastapi.middleware.cors import CORSMiddleware
 
 print(settings.database_name)
 
@@ -22,12 +23,23 @@ app = FastAPI(
      docs_url="/"
 )
 
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 models.Base.metadata.create_all(bind=engine)
 
 app.include_router(posts.routers)
 app.include_router(users.routers)
 app.include_router(auth.routers)
 app.include_router(like.router)
+
 
 if __name__ == "__main__":
     uvicorn.run("app.main:app", reload=True)
