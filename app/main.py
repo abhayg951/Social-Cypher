@@ -10,7 +10,7 @@ from fastapi.middleware.cors import CORSMiddleware
 print(settings.database_name)
 
 app = FastAPI(
-    title="Post System",
+    title="Social Cypher",
     summary="This API enables users to Create, Read, Update, and Delete records seamlessly while ensuring security through robust user authentication, offering a comprehensive data management solution.",
     description='''This comprehensive API empowers users with full CRUD capabilities for managing posts while ensuring secure access through user authentication\n. 
     Beyond basic operations, it features a robust like system, enabling users to interact with posts by viewing and contributing to like counts\n. 
@@ -33,7 +33,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-models.Base.metadata.create_all(bind=engine)
+# models.Base.metadata.create_all(bind=engine)
 
 app.include_router(posts.routers)
 app.include_router(users.routers)
